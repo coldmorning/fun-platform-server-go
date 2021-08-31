@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  fun-platform-redis-node1:
+    image: redis:6.2.5-alpine3.14
+    container_name: fun-platform-redis-node1
+    ports:
+      - 6380:6379
+    command: redis-server --requirepass password123 --appendonly yes
+
+ 
+    restart: always

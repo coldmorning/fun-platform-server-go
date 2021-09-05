@@ -1,14 +1,30 @@
-package auth
+package usecase
 
 import (
 	"os"
 	"time"
+	"errors"
 	"strconv"
     "github.com/dgrijalva/jwt-go"
     "github.com/twinj/uuid"
 	"fun-platform-server/domain"
+	"fun-platform-server/auth/repository/postgresql"
 	"github.com/go-redis/redis/v7"
 )
+
+func Login(u domain.User)(*domain.User,error){
+
+    user, err := postgresql.FetchUser(u)
+	if err != nil{
+		return nil,err
+	}
+	if user == nil{
+		return nil,errors.New("(user can not find)")
+	}
+	
+	return user,nil;
+}
+
 func CreateToken(userId uint64)(*domain.TokenDetails,error){
 	td:= &domain.TokenDetails{}
 	td.AtExpires = time.Now().Add(time.Minute *15).Unix()

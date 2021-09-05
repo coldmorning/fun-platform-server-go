@@ -1,4 +1,4 @@
-package auth_handler
+package http
 
 import (
 	"os"
@@ -6,25 +6,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v7"
 	"fun-platform-server/domain"
-	"fun-platform-server/auth/usercase"
+	"fun-platform-server/auth/usecase"
 
 )
 var client *redis.Client
 
-var user = domain.User{
-	ID: 1,
-	Username: "username@gmail.com",
-	Password: "password",
-}
+
 
 func init(){
 	dsn := os.Getenv("REDIS_DSN")
 	if len(dsn) == 0 {
-		dsn = "localhost:6379"
+		dsn = "localhost:6380"
 	}
 	client = redis.NewClient(&redis.Options{
 		Addr:     dsn,
-		Password: "", // no password set
+		Password: "password123", // no password set
 		DB:       0,  // use default DB
 	})
 	_,err := client.Ping().Result()
@@ -41,17 +37,18 @@ func Login(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
 		return
 	}
-	if user.Username != u.Username || user.Password !=u.Password{
-		c.JSON(http.StatusUnauthorized,"Please provide valid login details")
+	user, err := usecase.Login(u)
+	if err != nil{
+		c.JSON(http.StatusUnauthorized,"Please provide valid login details "+err.Error())
 		return
 	}
 
-	token,err := auth.CreateToken(user.ID)
+	token,err := usecase.CreateToken(user.ID)
 	if err !=nil{
 		c.JSON(http.StatusUnprocessableEntity,err.Error())
 		return
 	}
-	err = auth.CreateAuth(user.ID,token,client)
+	err = usecase.CreateAuth(user.ID,token,client)
 	if err != nil{
 		c.JSON(http.StatusUnprocessableEntity,err.Error())
 	}

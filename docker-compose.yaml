@@ -7,16 +7,19 @@ services:
       - 6380:6379
     command: redis-server --requirepass password123 --appendonly yes
     restart: unless-stopped
-   
+    networks:
+      - redis
   redis-gui:
     container_name: redis-gui
     hostname: redis-gui
     image: rediscommander/redis-commander:latest
     restart: always
     environment:
-    - REDIS_HOSTS=local:redis:6380
+      REDIS_HOSTS: label:fun-platform-redis-node1:6379:0:password123
     ports:
-    - 8091:8081
+      - 8091:8081
+    networks:
+      - redis
   postgresql:
     container_name: postgres13
     image: postgres:13.4-alpine
@@ -50,5 +53,7 @@ services:
 
 networks:
   postgres:
+    driver: bridge
+  redis:
     driver: bridge
 

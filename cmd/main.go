@@ -9,6 +9,9 @@ import (
 var router = gin.Default()
 
 func main(){
+
 	router.POST("/api/v1/login",http.Login)
+	router.POST("/api/v1/logout",http.Logout)
+	router.GET("/api/v1/test",http.Test)
 	log.Fatal(router.Run(":8080"))
 }

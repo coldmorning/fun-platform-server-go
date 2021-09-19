@@ -31,13 +31,13 @@ func init(){
 
 func Login(c *gin.Context){
 
-	var u domain.User
+	var body domain.User
 	var err error
-	if err = c.ShouldBindJSON(&u);err != nil{
+	if err = c.ShouldBindJSON(&body);err != nil{
 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
 		return
 	}
-	user, err := usecase.Login(u)
+	user, err := usecase.FindUser(body)
 	if err != nil{
 		c.JSON(http.StatusUnauthorized,"Please provide valid login details "+err.Error())
 		return
@@ -58,4 +58,20 @@ func Login(c *gin.Context){
 	}
 	
 	c.JSON(http.StatusOK, tokens)
+}
+
+func Test(c *gin.Context){
+		token, err :=usecase.VerifyToken(c.Request)
+		if err !=nil{
+			c.JSON(http.StatusUnprocessableEntity,err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, token)		
+	
+}
+
+func Logout(C *gin.Context){
+	//var u domain.User
+	//var err error
+	
 }

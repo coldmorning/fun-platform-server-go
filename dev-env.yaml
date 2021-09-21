@@ -1,0 +1,20 @@
+
+
+
+#redis 
+REDIS_NODE1:
+    ENDPOINT: localhost:6380
+    PASSWORD: password123
+    POOL_SIZE: 100
+
+
+
+#postgreSQL
+DB_POSTGRESQL:
+    HOST: localhost
+    PORT: 5432
+    DBNAME: fun-platform
+    USER: root
+    PASSWORD: root
+
+

@@ -2,7 +2,9 @@ package http
 
 import (
 	"os"
+	"log"
 	"net/http"
+	"github.com/spf13/viper"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v7"
 	"fun-platform-server/domain"
@@ -14,18 +16,37 @@ var client *redis.Client
 
 
 func init(){
-	dsn := os.Getenv("REDIS_DSN")
-	if len(dsn) == 0 {
-		dsn = "localhost:6380"
+	path,err := os.Getwd()
+	
+	if err != nil {
+		log.Println("read path error")
 	}
+	parent_path := path[:len(path)-4];
+	
+    config := viper.New()
+	config.AddConfigPath(parent_path) 
+	config.SetConfigType("yaml")
+    config.SetConfigName ("dev-env")
+	if err := config.ReadInConfig(); err != nil {
+        if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+            // Config file not found; ignore error if desired
+            log.Println("no such config file")
+        } else {
+            // Config file was found but another error was produced
+            log.Println("read config error")
+        }
+        log.Fatal (err) // failed to read configuration file. Fatal error
+	}
+
+
 	client = redis.NewClient(&redis.Options{
-		Addr:     dsn,
-		Password: "password123", // no password set
+		Addr:     config.GetString("REDIS_NODE1.ENDPOINT"),
+		Password: config.GetString("REDIS_NODE1.PASSWORD"), // no password set
 		DB:       0,  // use default DB
 	})
-	_,err := client.Ping().Result()
+	_,err = client.Ping().Result()
 	if err != nil{
-		panic(err)	
+		log.Fatal (err)
 	}
 }
 

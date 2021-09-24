@@ -1,12 +1,11 @@
 package http
 
 import (
-	"os"
 	"log"
 	"net/http"
-	"github.com/spf13/viper"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v7"
+	"fun-platform-server/config"
 	"fun-platform-server/domain"
 	"fun-platform-server/auth/usecase"
 
@@ -16,28 +15,10 @@ var client *redis.Client
 
 
 func init(){
-	path,err := os.Getwd()
-	
-	if err != nil {
-		log.Println("read path error")
+	config,err := config.GetConfig();
+	if err != nil{
+		log.Fatal (err)
 	}
-	parent_path := path[:len(path)-4];
-	
-    config := viper.New()
-	config.AddConfigPath(parent_path) 
-	config.SetConfigType("yaml")
-    config.SetConfigName ("dev-env")
-	if err := config.ReadInConfig(); err != nil {
-        if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-            // Config file not found; ignore error if desired
-            log.Println("no such config file")
-        } else {
-            // Config file was found but another error was produced
-            log.Println("read config error")
-        }
-        log.Fatal (err) // failed to read configuration file. Fatal error
-	}
-
 
 	client = redis.NewClient(&redis.Options{
 		Addr:     config.GetString("REDIS_NODE1.ENDPOINT"),
@@ -64,12 +45,12 @@ func Login(c *gin.Context){
 		return
 	}
 
-	token,err := usecase.CreateToken(user.ID)
+	token,err := usecase.CreateToken(user.Uuid)
 	if err !=nil{
 		c.JSON(http.StatusUnprocessableEntity,err.Error())
 		return
 	}
-	err = usecase.CreateAuth(user.ID,token,client)
+	err = usecase.CreateAuth(user.Uuid,token,client)
 	if err != nil{
 		c.JSON(http.StatusUnprocessableEntity,err.Error())
 	}

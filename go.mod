@@ -18,4 +18,6 @@ require (
 	github.com/twinj/uuid v1.0.0
 	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77 // indirect
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
+	gorm.io/driver/postgres v1.1.1 // indirect
+	gorm.io/gorm v1.21.15 // indirect
 )

@@ -1,19 +1,49 @@
 package postgresql
 
 import (
+	"fmt"
+	"fun-platform-server/config"
 	"fun-platform-server/domain"
+	"log"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
+var db *gorm.DB
 
-func FetchUser(u domain.User)(*domain.User,error){
+func init() {
+	config, err := config.GetConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=%s",
+		config.GetString("DB_POSTGRESQL.HOST"),
+		config.GetString("DB_POSTGRESQL.PORT"),
+		config.GetString("DB_POSTGRESQL.USER"),
+		config.GetString("DB_POSTGRESQL.PASSWORD"),
+		config.GetString("DB_POSTGRESQL.DBNAME"),
+		config.GetString("DB_POSTGRESQL.SSLMODEL"),
+		config.GetString("DB_POSTGRESQL.TimeZone"),
+	)
+
+	db, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
+	if err != nil {
+		log.Println("connection to postgres failed:", err)
+	} else {
+		log.Println("Database connected ...")
+	}
+
+}
+
+func FetchUser(user domain.User) (returnUser *domain.User, err error) {
 
 	//get user from database.
-	
-	var user = domain.User{
-		ID: 1,
-		Username: "username@gmail.com",
-		Password: "password",
-	}
-	return &user,nil;
 
+	err = db.Where(&returnUser, "email= ? AND password =? AND is_delete =? ", user.Email, user.Password, false).Error
+	if err != nil {
+		log.Println("FetchUser:", err)
+		return nil, err
+	}
+	return returnUser, nil
 }

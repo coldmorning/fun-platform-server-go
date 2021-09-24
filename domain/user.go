@@ -1,7 +1,12 @@
 package domain
 
+import "gorm.io/gorm"
+
 type User struct {
-	ID uint64 `json:"id"`
+	gorm.Model
+	Uuid uint64 `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Email string `json:"email"`
+	Is_delete string 
 }

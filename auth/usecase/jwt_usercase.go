@@ -5,7 +5,6 @@ import (
 	"fun-platform-server/auth/repository/postgresql"
 	"fun-platform-server/domain"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -78,7 +77,7 @@ func VerifyToken(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
-func CreateAesccToken(userId uint64, td *domain.TokenDetails) (*domain.TokenDetails, error) {
+func CreateAesccToken(userId string, td *domain.TokenDetails) (*domain.TokenDetails, error) {
 	var err error
 	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
 	td.AcessUuid = uuid.NewV4().String()
@@ -97,7 +96,7 @@ func CreateAesccToken(userId uint64, td *domain.TokenDetails) (*domain.TokenDeta
 	return td, err
 }
 
-func CreateRefreshToken(userId uint64, td *domain.TokenDetails) (*domain.TokenDetails, error) {
+func CreateRefreshToken(userId string, td *domain.TokenDetails) (*domain.TokenDetails, error) {
 	var err error
 	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
 	td.RefreshUuid = uuid.NewV4().String()
@@ -115,7 +114,7 @@ func CreateRefreshToken(userId uint64, td *domain.TokenDetails) (*domain.TokenDe
 	return td, err
 }
 
-func CreateToken(userId uint64) (*domain.TokenDetails, error) {
+func CreateToken(userId string) (*domain.TokenDetails, error) {
 	td := &domain.TokenDetails{}
 	var err error
 
@@ -132,17 +131,17 @@ func CreateToken(userId uint64) (*domain.TokenDetails, error) {
 	return td, nil
 }
 
-func CreateAuth(userId uint64, td *domain.TokenDetails, client *redis.Client) error {
+func CreateAuth(userId string, td *domain.TokenDetails, client *redis.Client) error {
 	at := time.Unix(td.AtExpires, 0)
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
-	errAcess := client.Set(td.AcessUuid, strconv.Itoa(int(userId)), at.Sub(now)).Err()
+	errAcess := client.Set(td.AcessUuid, userId, at.Sub(now)).Err()
 	if errAcess != nil {
 		return errAcess
 	}
 
-	errRefresh := client.Set(td.RefreshUuid, strconv.Itoa(int(userId)), rt.Sub(now)).Err()
+	errRefresh := client.Set(td.RefreshUuid, userId, rt.Sub(now)).Err()
 	if errRefresh != nil {
 		return errRefresh
 	}

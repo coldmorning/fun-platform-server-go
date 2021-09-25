@@ -40,7 +40,7 @@ func FetchUser(user domain.User) (returnUser *domain.User, err error) {
 
 	//get user from database.
 
-	err = db.Where(&returnUser, "email= ? AND password =? AND is_delete =? ", user.Email, user.Password, false).Error
+	err = db.Table("user").Where("email= ? AND password =? AND delete_time is null ", user.Email, user.Password).First(&returnUser).Error
 	if err != nil {
 		log.Println("FetchUser:", err)
 		return nil, err

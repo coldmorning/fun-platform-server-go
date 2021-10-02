@@ -1,9 +1,7 @@
-package usecase
+package authservice
 
 import (
 	"errors"
-	"fun-platform-server/auth/repository/postgresql"
-	"fun-platform-server/domain"
 	"net/http"
 	"strings"
 	"time"
@@ -11,6 +9,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis/v7"
 	"github.com/twinj/uuid"
+	
+	"github.com/coldmorning/fun-platform/auth/repository/postgresql"
+	"github.com/coldmorning/fun-platform/domain"
 )
 
 var (
@@ -26,7 +27,7 @@ var (
 
 func FindUser(u domain.User) (*domain.User, error) {
 
-	user, err := postgresql.FetchUser(u)
+	user, err := authpostresql.FetchUser(u)
 	if err != nil {
 		return nil, err
 	}

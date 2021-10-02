@@ -1,17 +1,18 @@
-package http
+package authttp
 
 import (
 	"log"
 	"net/http"
-	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v7"
-	"fun-platform-server/config"
-	"fun-platform-server/domain"
-	"fun-platform-server/auth/usecase"
-
+	"github.com/gin-gonic/gin"
+	
+	"github.com/coldmorning/fun-platform/config"
+	"github.com/coldmorning/fun-platform/domain"
+	"github.com/coldmorning/fun-platform/auth/service"
 )
-var client *redis.Client
 
+
+var client *redis.Client
 
 
 func init(){
@@ -31,6 +32,9 @@ func init(){
 	}
 }
 
+
+
+
 func Login(c *gin.Context){
 
 	var body domain.User
@@ -39,18 +43,18 @@ func Login(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
 		return
 	}
-	user, err := usecase.FindUser(body)
+	user, err := authservice.FindUser(body)
 	if err != nil{
 		c.JSON(http.StatusUnauthorized,"Please provide valid login details "+err.Error())
 		return
 	}
 
-	token,err := usecase.CreateToken(user.Uuid)
+	token,err := authservice.CreateToken(user.Uuid)
 	if err !=nil{
 		c.JSON(http.StatusUnprocessableEntity,err.Error())
 		return
 	}
-	err = usecase.CreateAuth(user.Uuid,token,client)
+	err = authservice.CreateAuth(user.Uuid,token,client)
 	if err != nil{
 		c.JSON(http.StatusUnprocessableEntity,err.Error())
 	}
@@ -63,7 +67,7 @@ func Login(c *gin.Context){
 }
 
 func Test(c *gin.Context){
-		token, err :=usecase.VerifyToken(c.Request)
+		token, err :=authservice.VerifyToken(c.Request)
 		if err !=nil{
 			c.JSON(http.StatusUnprocessableEntity,err.Error())
 			return

@@ -1,13 +1,14 @@
-package postgresql
+package authpostresql
 
 import (
 	"fmt"
-	"fun-platform-server/config"
-	"fun-platform-server/domain"
 	"log"
-
+	
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	
+	"github.com/coldmorning/fun-platform/domain"
+	"github.com/coldmorning/fun-platform/config"
 )
 
 var db *gorm.DB

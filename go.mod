@@ -1,4 +1,4 @@
-module fun-platform-server
+module github.com/coldmorning/fun-platform
 
 go 1.16
 

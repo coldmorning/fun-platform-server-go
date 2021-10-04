@@ -10,7 +10,7 @@ import (
 	"github.com/go-redis/redis/v7"
 	"github.com/twinj/uuid"
 	
-	"github.com/coldmorning/fun-platform/auth/repository/postgresql"
+	"github.com/coldmorning/fun-platform/auth/dao/postgresql"
 	"github.com/coldmorning/fun-platform/domain"
 )
 

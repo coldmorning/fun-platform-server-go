@@ -15,4 +15,5 @@ type User struct {
 	Update_time time.Time
 	Create_by string
 	Update_by string
+	Delete_by string
 }

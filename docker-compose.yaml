@@ -1,5 +1,11 @@
 version: '3.8'
 services:
+  swagger-editor:
+    container_name: swagger-editor
+    image: swaggerapi/swagger-editor
+    ports:
+      - 80:8080
+
   fun-platform-redis-node1:
     image: redis:6.2.5-alpine3.14
     container_name: fun-platform-redis-node1

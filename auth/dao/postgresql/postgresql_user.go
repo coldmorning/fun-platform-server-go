@@ -7,7 +7,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	
-	"github.com/coldmorning/fun-platform/domain"
+	"github.com/coldmorning/fun-platform/model"
 	"github.com/coldmorning/fun-platform/config"
 )
 
@@ -37,7 +37,7 @@ func init() {
 
 }
 
-func FetchUser(user domain.User) (returnUser *domain.User, err error) {
+func FetchUser(user model.User) (returnUser *model.User, err error) {
 
 	//get user from database.
 

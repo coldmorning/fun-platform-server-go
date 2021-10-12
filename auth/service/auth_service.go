@@ -11,7 +11,7 @@ import (
 	"github.com/twinj/uuid"
 	
 	"github.com/coldmorning/fun-platform/auth/dao/postgresql"
-	"github.com/coldmorning/fun-platform/domain"
+	"github.com/coldmorning/fun-platform/model"
 )
 
 var (
@@ -25,7 +25,7 @@ var (
 	ErrorOtherToken     = errors.New("Couldn't handle this token")
 )
 
-func FindUser(u domain.User) (*domain.User, error) {
+func FindUser(u model.User) (*model.User, error) {
 
 	user, err := authpostresql.FetchUser(u)
 	if err != nil {
@@ -78,7 +78,7 @@ func VerifyToken(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
-func CreateAesccToken(userId string, td *domain.TokenDetails) (*domain.TokenDetails, error) {
+func CreateAesccToken(userId string, td *model.TokenDetails) (*model.TokenDetails, error) {
 	var err error
 	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
 	td.AcessUuid = uuid.NewV4().String()
@@ -97,7 +97,7 @@ func CreateAesccToken(userId string, td *domain.TokenDetails) (*domain.TokenDeta
 	return td, err
 }
 
-func CreateRefreshToken(userId string, td *domain.TokenDetails) (*domain.TokenDetails, error) {
+func CreateRefreshToken(userId string, td *model.TokenDetails) (*model.TokenDetails, error) {
 	var err error
 	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
 	td.RefreshUuid = uuid.NewV4().String()
@@ -115,8 +115,8 @@ func CreateRefreshToken(userId string, td *domain.TokenDetails) (*domain.TokenDe
 	return td, err
 }
 
-func CreateToken(userId string) (*domain.TokenDetails, error) {
-	td := &domain.TokenDetails{}
+func CreateToken(userId string) (*model.TokenDetails, error) {
+	td := &model.TokenDetails{}
 	var err error
 
 	td, err = CreateAesccToken(userId, td)
@@ -132,7 +132,7 @@ func CreateToken(userId string) (*domain.TokenDetails, error) {
 	return td, nil
 }
 
-func CreateAuth(userId string, td *domain.TokenDetails, client *redis.Client) error {
+func CreateAuth(userId string, td *model.TokenDetails, client *redis.Client) error {
 	at := time.Unix(td.AtExpires, 0)
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()

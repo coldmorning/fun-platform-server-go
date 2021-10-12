@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	
 	"github.com/coldmorning/fun-platform/config"
-	"github.com/coldmorning/fun-platform/domain"
+	"github.com/coldmorning/fun-platform/model"
 	"github.com/coldmorning/fun-platform/auth/service"
 )
 
@@ -37,7 +37,7 @@ func init(){
 
 func Login(c *gin.Context){
 
-	var body domain.User
+	var body model.User
 	var err error
 	if err = c.ShouldBindJSON(&body);err != nil{
 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
@@ -77,7 +77,7 @@ func Test(c *gin.Context){
 }
 
 func Logout(C *gin.Context){
-	//var u domain.User
+	//var u model.User
 	//var err error
 	
 }

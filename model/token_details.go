@@ -1,4 +1,4 @@
-package domain
+package model
 
 type TokenDetails struct{
 	AccessToken string

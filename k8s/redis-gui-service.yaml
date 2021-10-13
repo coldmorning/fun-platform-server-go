@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert
+    kompose.version: 1.24.0 (7c629530)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: redis-gui
+  name: redis-gui
+spec:
+  ports:
+    - name: "8091"
+      port: 8091
+      targetPort: 8081
+  selector:
+    io.kompose.service: redis-gui
+status:
+  loadBalancer: {}

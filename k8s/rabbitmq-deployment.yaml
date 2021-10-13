@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert
+    kompose.version: 1.24.0 (7c629530)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: rabbitmq
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: rabbitmq
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert
+        kompose.version: 1.24.0 (7c629530)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/rabbitmq_net: "true"
+        io.kompose.service: rabbitmq
+    spec:
+      containers:
+        - env:
+            - name: RABBITMQ_DEFAULT_PASS
+              value: admin
+            - name: RABBITMQ_DEFAULT_USER
+              value: admin
+            - name: RABBITMQ_DEFAULT_VHOST
+              value: my_vhost
+          image: rabbitmq:3.8.22-management-alpine
+          name: rabbitmq
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/rabbitmq/
+              name: rabbitmq-claim0
+            - mountPath: C:\Users\yulia\Desktop\docker\rabbitmq\log/rabbitmq
+              name: rabbitmq-claim1
+      restartPolicy: Always
+      volumes:
+        - name: rabbitmq-claim0
+          persistentVolumeClaim:
+            claimName: rabbitmq-claim0
+        - name: rabbitmq-claim1
+          persistentVolumeClaim:
+            claimName: rabbitmq-claim1
+status: {}

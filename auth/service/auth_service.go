@@ -10,8 +10,8 @@ import (
 	"github.com/go-redis/redis/v7"
 	"github.com/twinj/uuid"
 	
-	"github.com/coldmorning/fun-platform/auth/dao/postgresql"
 	"github.com/coldmorning/fun-platform/model"
+	"github.com/coldmorning/fun-platform/auth/dao/postgresql"
 )
 
 var (

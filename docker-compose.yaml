@@ -76,4 +76,6 @@ networks:
     driver: bridge
   redis:
     driver: bridge
+  rabbitmq_net:
+    driver: bridge
 

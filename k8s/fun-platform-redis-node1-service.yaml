@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert
+    kompose.version: 1.24.0 (7c629530)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: fun-platform-redis-node1
+  name: fun-platform-redis-node1
+spec:
+  ports:
+    - name: "6380"
+      port: 6380
+      targetPort: 6379
+  selector:
+    io.kompose.service: fun-platform-redis-node1
+status:
+  loadBalancer: {}

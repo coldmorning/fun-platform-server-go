@@ -1,5 +1,6 @@
 package main
 import (
+	"os"
 	"log"
 	"github.com/go-redis/redis/v7"
 	"github.com/gin-gonic/gin"
@@ -31,9 +32,14 @@ func init(){
 
 
 func main(){
+	path, err := os.Getwd()
 
+	if err != nil {
+		log.Println("read path error")
+	}
+	swagger_path := path + "\\swagger-ui\\dist"
 	router := gin.New()
-
+	router.Static("/swaggerui", swagger_path)
 
 	v1_router := router.Group("/api/v1")
     {

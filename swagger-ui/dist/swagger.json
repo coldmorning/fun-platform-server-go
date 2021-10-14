@@ -1,0 +1,47 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "論壇API",
+    "description": "論壇API"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8083/api/v1"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "登入使用者",
+        "description": "產生acess_token, reflash_token",
+        "requestBody": {
+          "description": "產",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "test@gmail.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": 123456
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    }
+  }
+}

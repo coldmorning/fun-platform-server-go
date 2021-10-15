@@ -1,5 +1,15 @@
 
 
+#token
+Token:
+    ACCESS_TOKEN:
+        SECRET: playeresssd
+        #15 min 1000*60*15
+        TIME: 900000
+    REFRESH_TOKEN:
+        SECRET: qweasdghtyhq
+        # 7 day 1000*60*60*24*7
+        TIME: 604800000
 
 #redis 
 REDIS_NODE1:

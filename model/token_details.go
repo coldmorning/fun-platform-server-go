@@ -5,6 +5,11 @@ type AccessDetails struct {
 	UserId     string
 }
 
+type RefreshDetails struct {
+	RefreshUuid string
+	UserId      string
+}
+
 type TokenDetails struct {
 	AccessToken  string
 	RefreshToken string

@@ -12,13 +12,20 @@ import (
 	"github.com/coldmorning/fun-platform/model"
 )
 
-var client *redis.Client
+var (
+	client         *redis.Client
+	Access_secret  = []byte("")
+	Refresh_secret = []byte("")
+)
 
 func init() {
 	config, err := config.GetConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	Access_secret = []byte(config.GetString("Token.ACCESS_TOKEN.SECRET"))
+	Refresh_secret = []byte(config.GetString("Token.REFRESH_TOKEN.SECRET"))
 
 	client = redis.NewClient(&redis.Options{
 		Addr:     config.GetString("REDIS_NODE1.ENDPOINT"),
@@ -63,7 +70,7 @@ func Login(ctx *gin.Context) {
 }
 
 func Test(ctx *gin.Context) {
-	token, err := authservice.VerifyToken(ctx.Request)
+	token, err := authservice.VerifyAccessToken(Access_secret, ctx.Request)
 	if err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
@@ -75,21 +82,59 @@ func Test(ctx *gin.Context) {
 func Logout(ctx *gin.Context) {
 	//var u model.User
 	//var err error
-	token, err := authservice.VerifyToken(ctx.Request)
+	token, err := authservice.VerifyAccessToken(Access_secret, ctx.Request)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
-	accessDetails, err := authservice.ExtractTokenMetadata(token)
+	accessDetails, err := authservice.ExtractAccessTokenMetadata(token)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	err = authservice.RemoveToken(accessDetails, client)
+	err = authservice.RemoveTokens(accessDetails, client)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, "error to remove token")
 		return
 	}
 	ctx.JSON(http.StatusOK, "Successfully logged out")
+}
+
+func Refresh(ctx *gin.Context) {
+	mapToken := map[string]string{}
+	if err := ctx.ShouldBindJSON(&mapToken); err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+	refreshToken := mapToken["refresh_token"]
+
+	token, err := authservice.VerifyToken(Refresh_secret, refreshToken)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, "unauthorized:"+err.Error())
+		return
+	}
+	refreshDetails, err := authservice.ExtractRefreshTokenMetadata(token)
+	deleted, err := authservice.RemoveAuth(refreshDetails.RefreshUuid, client)
+	if err != nil || deleted == 0 { //if any goes wrong
+		ctx.JSON(http.StatusInternalServerError, "StatusInternalServerError:"+err.Error())
+		return
+	}
+
+	tokenDetails, err := authservice.CreateToken(refreshDetails.UserId)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+	err = authservice.CreateAuth(refreshDetails.UserId, tokenDetails, client)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+	tokens := map[string]string{
+		"access_token":  tokenDetails.AccessToken,
+		"refresh_token": tokenDetails.RefreshToken,
+	}
+
+	ctx.JSON(http.StatusOK, tokens)
+
 }

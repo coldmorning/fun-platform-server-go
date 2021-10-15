@@ -3,35 +3,54 @@ package authservice
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
 
+	authpostresql "github.com/coldmorning/fun-platform/auth/dao/postgresql"
+	"github.com/coldmorning/fun-platform/config"
+	"github.com/coldmorning/fun-platform/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis/v7"
 	"github.com/twinj/uuid"
-
-	authpostresql "github.com/coldmorning/fun-platform/auth/dao/postgresql"
-	"github.com/coldmorning/fun-platform/model"
 )
 
 var (
-	Refresh_SECRET = []byte("qweasdghtyhq")
-	ACESS_SECRET   = []byte("playeresssd")
-
 	ErrInvalidToken     = errors.New("token is invalid")
 	ErrExpiredToken     = errors.New("token has expired")
 	ErrSignMethodToken  = errors.New("unexpected signing method")
 	ErrorMalformedToken = errors.New("token is malformed (Not correct format)")
 	ErrorOtherToken     = errors.New("Couldn't handle this token")
 
-	ErrorDelASToken           = errors.New("Couldn't remove acess token from redisk")
-	ErrorDelRFToken           = errors.New("Couldn't remove refresh token from redisk")
-	ErrorGetASToken           = errors.New("Couldn't get acess token from redisk")
-	ErrorGetRFToken           = errors.New("Couldn't get refresh token from redisk")
+	ErrorDelASTokenRedis      = errors.New("Couldn't remove access token from redisk")
+	ErrorDelRFTokenRedis      = errors.New("Couldn't remove refresh token from redisk")
+	ErrorGetASTokenRedis      = errors.New("Couldn't get access token from redisk")
+	ErrorGetRFTokenRedis      = errors.New("Couldn't get refresh token from redisk")
+	ErrorGetASToken           = errors.New("Couldn't extract access token")
+	ErrorGetRFToken           = errors.New("Couldn't extract refresh token")
+	ErrorGetASUuid            = errors.New("Couldn't extract access uuid")
+	ErrorGetRFUuid            = errors.New("Couldn't extract refresh uuid")
+	ErrorGetUserId            = errors.New("Couldn't extract  userId")
 	ErrorExtractTokenMetadata = errors.New("Couldn't ExtractTokenMetadata ")
 )
+var (
+	Access_secret  = []byte("")
+	Refresh_secret = []byte("")
+	Access_time    = -1
+	Refresh_time   = -1
+)
 
+func init() {
+	config, err := config.GetConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+	Access_secret = []byte(config.GetString("Token.ACCESS_TOKEN.SECRET"))
+	Refresh_secret = []byte(config.GetString("Token.REFRESH_TOKEN.SECRET"))
+	Access_time = config.GetInt("Token.ACCESS_TOKEN.TIME")
+	Refresh_time = config.GetInt("Token.REFRESH_TOKEN.TIME")
+}
 func FindUser(u model.User) (*model.User, error) {
 
 	user, err := authpostresql.FetchUser(u)
@@ -45,7 +64,7 @@ func FindUser(u model.User) (*model.User, error) {
 	return user, nil
 }
 
-func ExtractTokenMetadata(token *jwt.Token) (*model.AccessDetails, error) {
+func ExtractAccessTokenMetadata(token *jwt.Token) (*model.AccessDetails, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok {
 		accessUuid, ok := claims["access_uuid"].(string)
@@ -54,7 +73,7 @@ func ExtractTokenMetadata(token *jwt.Token) (*model.AccessDetails, error) {
 		}
 		userId, ok := claims["user_id"].(string)
 		if !ok {
-			return nil, ErrorGetRFToken
+			return nil, ErrorGetUserId
 		}
 
 		return &model.AccessDetails{
@@ -65,8 +84,27 @@ func ExtractTokenMetadata(token *jwt.Token) (*model.AccessDetails, error) {
 	return nil, ErrorExtractTokenMetadata
 }
 
-func VerifyToken(r *http.Request) (*jwt.Token, error) {
+func ExtractRefreshTokenMetadata(token *jwt.Token) (*model.RefreshDetails, error) {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok {
+		refreshUuid, ok := claims["refresh_uuid"].(string)
+		if !ok {
+			return nil, ErrorGetRFUuid
+		}
+		userId, ok := claims["user_id"].(string)
+		if !ok {
+			return nil, ErrorGetUserId
+		}
 
+		return &model.RefreshDetails{
+			RefreshUuid: refreshUuid,
+			UserId:      userId,
+		}, nil
+	}
+	return nil, ErrorExtractTokenMetadata
+}
+
+func VerifyAccessToken(screctKey []byte, r *http.Request) (*jwt.Token, error) {
 	var tokenStr string = ""
 	bearerToken := r.Header.Get("Authorization")
 	strArr := strings.Split(bearerToken, " ")
@@ -75,13 +113,18 @@ func VerifyToken(r *http.Request) (*jwt.Token, error) {
 	} else {
 		return nil, ErrorMalformedToken
 	}
+	return VerifyToken(screctKey, tokenStr)
+}
+
+func VerifyToken(screctKey []byte, tokenStr string) (*jwt.Token, error) {
+
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
 			return nil, ErrSignMethodToken
 		}
 
-		return ACESS_SECRET, nil
+		return screctKey, nil
 	})
 	if err != nil {
 		return nil, err
@@ -107,16 +150,17 @@ func VerifyToken(r *http.Request) (*jwt.Token, error) {
 
 func CreateAesccToken(userId string, td *model.TokenDetails) (*model.TokenDetails, error) {
 	var err error
-	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
+	td.AtExpires = time.Now().Add(time.Duration(Access_time) * time.Microsecond).Unix()
 	td.AccessUuid = uuid.NewV4().String()
 
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["user_id"] = userId
 	atClaims["access_uuid"] = td.AccessUuid
-	atClaims["exp"] = time.Now().Add(time.Second * 20).Unix()
+	atClaims["exp"] = td.AtExpires
 	at := jwt.NewWithClaims(jwt.SigningMethodHS512, atClaims)
-	td.AccessToken, err = at.SignedString(ACESS_SECRET)
+
+	td.AccessToken, err = at.SignedString(Access_secret)
 
 	if err != nil {
 		return nil, err
@@ -126,14 +170,14 @@ func CreateAesccToken(userId string, td *model.TokenDetails) (*model.TokenDetail
 
 func CreateRefreshToken(userId string, td *model.TokenDetails) (*model.TokenDetails, error) {
 	var err error
-	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
+	td.RtExpires = time.Now().Add(time.Duration(Refresh_time) * time.Microsecond).Unix()
 	td.RefreshUuid = td.AccessUuid + "++" + userId
 	rtClaims := jwt.MapClaims{}
 	rtClaims["refresh_uuid"] = td.RefreshUuid
 	rtClaims["user_id"] = userId
 	rtClaims["exp"] = td.RtExpires
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS512, rtClaims)
-	td.RefreshToken, err = rt.SignedString(Refresh_SECRET)
+	td.RefreshToken, err = rt.SignedString(Refresh_secret)
 
 	if err != nil {
 		return nil, err
@@ -158,17 +202,17 @@ func CreateToken(userId string) (*model.TokenDetails, error) {
 	return td, nil
 }
 
-func RemoveToken(auth *model.AccessDetails, client *redis.Client) error {
+func RemoveTokens(auth *model.AccessDetails, client *redis.Client) error {
 	refreshUuid := fmt.Sprintf("%s++%s", auth.AccessUuid, auth.UserId)
 
 	access, err := client.Del(auth.AccessUuid).Result()
 
 	if err != nil {
-		return errors.New(ErrorDelASToken.Error() + ":" + err.Error())
+		return errors.New(ErrorDelASTokenRedis.Error() + ":" + err.Error())
 	}
 	refresh, err := client.Del(refreshUuid).Result()
 	if err != nil {
-		return errors.New(ErrorDelASToken.Error() + ":" + err.Error())
+		return errors.New(ErrorDelASTokenRedis.Error() + ":" + err.Error())
 	}
 
 	if access != 1 || refresh != 1 {
@@ -194,11 +238,10 @@ func CreateAuth(userId string, td *model.TokenDetails, client *redis.Client) err
 	return nil
 }
 
-func RemoveAuth(auth *model.AccessDetails, client *redis.Client) error {
-
-	err := RemoveToken(auth, client)
+func RemoveAuth(givenUuid string, client *redis.Client) (int64, error) {
+	deleted, err := client.Del(givenUuid).Result()
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return deleted, nil
 }

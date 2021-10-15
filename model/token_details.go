@@ -1,10 +1,15 @@
 package model
 
-type TokenDetails struct{
-	AccessToken string
+type AccessDetails struct {
+	AccessUuid string
+	UserId     string
+}
+
+type TokenDetails struct {
+	AccessToken  string
 	RefreshToken string
-	AcessUuid string
-	RefreshUuid string
-	AtExpires int64
-	RtExpires int64
+	AccessUuid   string
+	RefreshUuid  string
+	AtExpires    int64
+	RtExpires    int64
 }

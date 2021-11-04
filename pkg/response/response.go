@@ -8,26 +8,23 @@ type err struct {
     BusinessCode  int `json:"business_code"`        
     Msg  string       `json:"msg"`  
     Data interface{}  `json:"data"`   
-	HttpCode string `json:"http_status"` 
+	HttpCode int `json:"http_status"` 
 	Err error
   
 }
 
-func NewError(code int, msg string, httpCode string) Error {
+func NewError(code int, msg string, httpCode int)  *err {
     return &err{
-        Code: code,
+        BusinessCode: code,
         Msg:  msg,
         Data: nil,
-		HttpStatus: httpstatus,
+		HttpCode: httpCode,
     }
 }
 
 func (e *err) i() {}
 
-func (e *err) WithData(data interface{}) Error {
-    e.Data = data
-    return e
-}
+
 
 
 func (e *err) GetHttpCode() int {
@@ -39,7 +36,7 @@ func (e *err) GetBusinessCode() int {
 }
 
 func (e *err) GetMsg() string {
-	return e.Message
+	return e.Msg
 }
 
 func (e *err) GetErr() error {
@@ -47,10 +44,10 @@ func (e *err) GetErr() error {
 }
 
 func (e *err) ToString() string {
-	err := &error{
+	err := &err{
 		HttpCode:     e.HttpCode,
 		BusinessCode: e.BusinessCode,
-		Message:      e.Message,
+		Msg:      e.Msg,
 	}
 
 	raw, _ := json.Marshal(err)

@@ -148,7 +148,7 @@ func VerifyToken(screctKey []byte, tokenStr string) (*jwt.Token, error) {
 
 }
 
-func CreateAesccToken(userId string, td *model.TokenDetails) (*model.TokenDetails, error) {
+func CreateAccessToken(userId string, td *model.TokenDetails) (*model.TokenDetails, error) {
 	var err error
 	td.AtExpires = time.Now().Add(time.Duration(Access_time) * time.Microsecond).Unix()
 	td.AccessUuid = uuid.NewV4().String()
@@ -189,7 +189,7 @@ func CreateToken(userId string) (*model.TokenDetails, error) {
 	td := &model.TokenDetails{}
 	var err error
 
-	td, err = CreateAesccToken(userId, td)
+	td, err = CreateAccessToken(userId, td)
 	if err != nil {
 		return nil, err
 	}

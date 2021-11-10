@@ -126,9 +126,7 @@ func VerifyToken(screctKey []byte, tokenStr string) (*jwt.Token, error) {
 
 		return screctKey, nil
 	})
-	if err != nil {
-		return nil, err
-	}
+
 
 	if token.Valid {
 		return token, nil
@@ -147,6 +145,7 @@ func VerifyToken(screctKey []byte, tokenStr string) (*jwt.Token, error) {
 	}
 
 }
+
 
 func CreateAccessToken(userId string, td *model.TokenDetails) (*model.TokenDetails, error) {
 	var err error
@@ -185,6 +184,7 @@ func CreateRefreshToken(userId string, td *model.TokenDetails) (*model.TokenDeta
 	return td, err
 }
 
+
 func CreateToken(userId string) (*model.TokenDetails, error) {
 	td := &model.TokenDetails{}
 	var err error
@@ -201,6 +201,7 @@ func CreateToken(userId string) (*model.TokenDetails, error) {
 
 	return td, nil
 }
+
 
 func RemoveTokens(auth *model.AccessDetails, client *redis.Client) error {
 	refreshUuid := fmt.Sprintf("%s++%s", auth.AccessUuid, auth.UserId)

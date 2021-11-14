@@ -1,5 +1,4 @@
 package main
-
 import (
 	"log"
 	"os"
@@ -44,17 +43,21 @@ func main() {
 
 	v1_router := router.Group("/api/v1")
 	{
-		v1_router.POST("login", middleware.AuthRequired, authttp.Login)
-		v1_router.POST("logout", middleware.AuthRequired, authttp.Logout)
-		v1_router.POST("refresh", middleware.AuthRequired, authttp.Refresh)
-		v1_router.GET("test", middleware.AuthRequired, authttp.Test)
+		v1_router.POST("login", middleware.Log, authttp.Login)
+		v1_router.POST("logout", middleware.Log, authttp.Logout)
+		v1_router.POST("refresh", middleware.Log, authttp.Refresh)
+		v1_router.GET("test", middleware.Log, authttp.Test)
+		
+		boardRouter := v1_router.Group("board")
+		boardRouter.Use(middleware.Auth)
+		{
+			boardRouter.GET("/", middleware.Auth, boardhttp.List)
+			boardRouter.POST("/:id", middleware.Auth, boardhttp.Create)
+			boardRouter.DELETE("/:id", middleware.Auth, boardhttp.Delete)
+			boardRouter.PUT("/:id", middleware.Auth, boardhttp.Update)
+			boardRouter.PATCH("/:id/state", middleware.Auth, boardhttp.Update)
 
-		v1_router.GET("board", middleware.AuthRequired, boardhttp.List)
-		v1_router.POST("board/:id", middleware.AuthRequired, boardhttp.Create)
-		v1_router.DELETE("board/:id", middleware.AuthRequired, boardhttp.Delete)
-		v1_router.PUT("board/:id", middleware.AuthRequired, boardhttp.Update)
-		v1_router.PATCH("board:id/state", middleware.AuthRequired, boardhttp.Update)
-
+		}
 	}
 
 	router.Run(":8083")

@@ -146,7 +146,6 @@ func VerifyToken(screctKey []byte, tokenStr string) (*jwt.Token, error) {
 
 }
 
-
 func CreateAccessToken(userId string, td *model.TokenDetails) (*model.TokenDetails, error) {
 	var err error
 	td.AtExpires = time.Now().Add(time.Duration(Access_time) * time.Microsecond).Unix()
@@ -184,7 +183,6 @@ func CreateRefreshToken(userId string, td *model.TokenDetails) (*model.TokenDeta
 	return td, err
 }
 
-
 func CreateToken(userId string) (*model.TokenDetails, error) {
 	td := &model.TokenDetails{}
 	var err error
@@ -201,7 +199,6 @@ func CreateToken(userId string) (*model.TokenDetails, error) {
 
 	return td, nil
 }
-
 
 func RemoveTokens(auth *model.AccessDetails, client *redis.Client) error {
 	refreshUuid := fmt.Sprintf("%s++%s", auth.AccessUuid, auth.UserId)

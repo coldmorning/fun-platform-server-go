@@ -136,5 +136,4 @@ func Refresh(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, tokens)
-
 }

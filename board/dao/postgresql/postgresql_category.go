@@ -1,4 +1,4 @@
-package categorypostresql
+package boardpostresql
 
 import (
 	"fmt"
@@ -37,13 +37,13 @@ func init() {
 
 }
 
-func CreateCategory(category *model.CreateCategoryRequest) (err error) {
+func CreateBoard(category *model.CreateBoardRequest) (err error) {
 
 	//get user from database.
 
 	err = db.Create(&category).Error
 	if err != nil {
-		log.Println("CreateCategory:", err)
+		log.Println("CreateBoard:", err)
 		return  err
 	}
 	return  nil

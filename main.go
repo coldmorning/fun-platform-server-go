@@ -5,7 +5,7 @@ import (
 	"os"
 
 	authttp "github.com/coldmorning/fun-platform/auth/controller/http"
-	categoryhttp "github.com/coldmorning/fun-platform/category/controller/http"
+	boardhttp "github.com/coldmorning/fun-platform/board/controller/http"
 	"github.com/coldmorning/fun-platform/config"
 	"github.com/coldmorning/fun-platform/middleware"
 	"github.com/gin-gonic/gin"
@@ -49,11 +49,11 @@ func main() {
 		v1_router.POST("refresh", middleware.AuthRequired, authttp.Refresh)
 		v1_router.GET("test", middleware.AuthRequired, authttp.Test)
 
-		v1_router.GET("category", middleware.AuthRequired, categoryhttp.List)
-		v1_router.POST("category/:id", middleware.AuthRequired, categoryhttp.Create)
-		v1_router.DELETE("category/:id", middleware.AuthRequired, categoryhttp.Delete)
-		v1_router.PUT("category/:id", middleware.AuthRequired, categoryhttp.Update)
-		v1_router.PATCH("category:id/state", middleware.AuthRequired, categoryhttp.Update)
+		v1_router.GET("board", middleware.AuthRequired, boardhttp.List)
+		v1_router.POST("board/:id", middleware.AuthRequired, boardhttp.Create)
+		v1_router.DELETE("board/:id", middleware.AuthRequired, boardhttp.Delete)
+		v1_router.PUT("board/:id", middleware.AuthRequired, boardhttp.Update)
+		v1_router.PATCH("board:id/state", middleware.AuthRequired, boardhttp.Update)
 
 	}
 

@@ -1,4 +1,4 @@
-package categoryhttp
+package boardhttp
 
 import (
 	"net/http"
@@ -6,14 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 	
 	"github.com/coldmorning/fun-platform/model"
-    "github.com/coldmorning/fun-platform/category/service"
+    "github.com/coldmorning/fun-platform/board/service"
 
 )
 
 
 
 func List(ctx *gin.Context){
-	var form model.CategoryRequest
+	var form model.BoardRequest
 	if err := ctx.ShouldBind(&form); err != nil {
 				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
@@ -21,12 +21,12 @@ func List(ctx *gin.Context){
 }
 
 func Create(ctx *gin.Context){
-	var form *model.CreateCategoryRequest
+	var form *model.CreateBoardRequest
 	if err := ctx.ShouldBind(&form); err != nil {
 				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				return
 	}
-	err := categoryservice.CreateCategoryRequest(form)
+	err := boardservice.CreateBoardRequest(form)
 	if err !=nil {
 		//422
 		ctx.JSON(http.StatusUnprocessableEntity, err.Error())	

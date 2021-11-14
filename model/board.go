@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type category struct{
+type board struct{
 	Uuid string `json:"uuid"`
 	Name string `json:"name"`
 	Picture_path string `json:"picture_path"`
@@ -20,19 +20,19 @@ type category struct{
 }
 
 
-type CategoryRequest struct{
+type BoardRequest struct{
 	Uuid uint32 `form:"uuid" binding:"required"`
 
 }
 
 
 
-type CategoryListRequest struct {
+type BoardListRequest struct {
 	
 	
 }
 
-type CreateCategoryRequest struct {
+type CreateBoardRequest struct {
 	Uuid string 
 	Name string `form:"name" binding:"required",max=150`
 	Picture_path string `form:"picture_path" binding:"required",max=300`
@@ -45,7 +45,7 @@ type CreateCategoryRequest struct {
 
 
 
-type UpdateCategoryRequest struct {
+type UpdateBoardRequest struct {
 	Uuid string `form:"uuid" binding:"required",max=40`
 	Name string `form:"name" binding:"required",max=150`
 	Picture_path string `form:"picture_path" binding:"required",max=300`
@@ -57,7 +57,7 @@ type UpdateCategoryRequest struct {
 	
 }
 
-type DeleteCategoryRequest struct {
+type DeleteBoardRequest struct {
 	Uuid uint32 `form:"uuid" binding:"required,gte=1"`
 	Delete_time time.Time `form:"delete_time" binding:"required",min=1`
 	Delete_by string `form:"delete_by" binding:"required",min=1`

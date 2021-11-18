@@ -20,6 +20,7 @@ var (
 	ErrInvalidToken     = errors.New("token is invalid")
 	ErrExpiredToken     = errors.New("token has expired")
 	ErrSignMethodToken  = errors.New("unexpected signing method")
+	ErrorNotFoundToken = errors.New("token not found")
 	ErrorMalformedToken = errors.New("token is malformed (Not correct format)")
 	ErrorOtherToken     = errors.New("Couldn't handle this token")
 
@@ -110,6 +111,8 @@ func VerifyAccessToken(screctKey []byte, r *http.Request) (*jwt.Token, error) {
 	strArr := strings.Split(bearerToken, " ")
 	if len(strArr) == 2 {
 		tokenStr = strArr[1]
+	} else if bearerToken =="" {
+		return nil, ErrorNotFoundToken
 	} else {
 		return nil, ErrorMalformedToken
 	}

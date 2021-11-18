@@ -66,8 +66,12 @@ func TestVerifyTokenErrorExpired(t *testing.T) {
 		  if assert.NotNil(t,errToken) {
 			// now we know that object isn't nil, we are safe to make
 			// further assertions without causing any errors
-			assert.Equal(t,ErrExpiredToken.Error(), errToken.Error())
+			assert.Equal(t, errToken.Error(), ErrExpiredToken.Error())
+		  }else{
+			  t.Errorf("errToken is nil"))
 		  }
+	}else{
+		t.Errorf("AccessToken can not create correctly"))
 	}
 }
 
@@ -84,12 +88,16 @@ func TestVerifyTokenErrorMalfFormat(t *testing.T) {
 	if err == nil {
 		_, errToken := VerifyToken(Access_secret,errorTokenFormat)
 		  // assert for not nil (good when you expect something)
-		  
+	
 		  if assert.NotNil(t,errToken) {
 			// now we know that object isn't nil, we are safe to make
 			// further assertions without causing any errors
 			assert.Equal(t,ErrorMalformedToken.Error(), errToken.Error())
+		  }else{
+			  t.Errorf("errToken is nil"))
 		  }
+	}else{
+		t.Errorf("AccessToken can not create correctly"))
 	}
 }
 
@@ -111,6 +119,10 @@ func TestVerifyTokenErrorOther(t *testing.T) {
 			// now we know that object isn't nil, we are safe to make
 			// further assertions without causing any errors
 			assert.Equal(t,ErrorOtherToken.Error(), errToken.Error())
+		  }else{
+			  t.Errorf("errToken is nil"))
 		  }
+	}else{
+		t.Errorf("AccessToken can not create correctly"))
 	}
 }

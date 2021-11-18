@@ -43,6 +43,7 @@ func main() {
 
 	v1_router := router.Group("/api/v1")
 	{
+		v1_router.POST("home", middleware.Log, authttp.Home)
 		v1_router.POST("login", middleware.Log, authttp.Login)
 		v1_router.POST("logout", middleware.Log, authttp.Logout)
 		v1_router.POST("refresh", middleware.Log, authttp.Refresh)

@@ -37,6 +37,14 @@ func init() {
 		log.Fatal(err)
 	}
 }
+func Home(ctx *gin.Context) {
+	home := map[string]string{
+		"home": "Wellcome to my home page",
+		
+	}
+	ctx.JSON(http.StatusOK, home)
+}
+
 
 func Login(ctx *gin.Context) {
 

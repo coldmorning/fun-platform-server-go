@@ -51,26 +51,66 @@ func TestVerifyTokenOk(t *testing.T) {
 
 
 func TestVerifyTokenErrorExpired(t *testing.T) {
-		//Create expect token
-		var err error
-		td := &model.TokenDetails{}
-		td.AtExpires = time.Now().Add( -1 * time.Second).Unix()
-		atClaims := jwt.MapClaims{}
-		atClaims["exp"] = td.AtExpires
-		at := jwt.NewWithClaims(jwt.SigningMethodHS512, atClaims)
-		td.AccessToken, err = at.SignedString(Access_secret)
-		if err == nil {
-			_, errToken := VerifyToken(Access_secret,td.AccessToken)
-			  // assert for not nil (good when you expect something)
-			  
-			  if assert.NotNil(t,errToken) {
-				// now we know that object isn't nil, we are safe to make
-				// further assertions without causing any errors
-				assert.Equal(t,ErrExpiredToken.Error(), errToken.Error())
-			  }
-		}
+	//Create expect token
+	var err error
+	td := &model.TokenDetails{}
+	td.AtExpires = time.Now().Add( -1 * time.Second).Unix()
+	atClaims := jwt.MapClaims{}
+	atClaims["exp"] = td.AtExpires
+	at := jwt.NewWithClaims(jwt.SigningMethodHS512, atClaims)
+	td.AccessToken, err = at.SignedString(Access_secret)
+	if err == nil {
+		_, errToken := VerifyToken(Access_secret,td.AccessToken)
+		  // assert for not nil (good when you expect something)
+		  
+		  if assert.NotNil(t,errToken) {
+			// now we know that object isn't nil, we are safe to make
+			// further assertions without causing any errors
+			assert.Equal(t,ErrExpiredToken.Error(), errToken.Error())
+		  }
+	}
 }
 
-func TestVerifyTokenErrorFormat(t *testing.T) {
+func TestVerifyTokenErrorMalfFormat(t *testing.T) {
+	var err error
+	td := &model.TokenDetails{}
+	td.AtExpires = time.Now().Add( 1 * time.Second).Unix()
+	atClaims := jwt.MapClaims{}
+	atClaims["exp"] = td.AtExpires
+	at := jwt.NewWithClaims(jwt.SigningMethodHS512, atClaims)
+	td.AccessToken, err = at.SignedString(Access_secret)
+	errorTokenFormat := "bearer "+td.AccessToken
+	
+	if err == nil {
+		_, errToken := VerifyToken(Access_secret,errorTokenFormat)
+		  // assert for not nil (good when you expect something)
+		  
+		  if assert.NotNil(t,errToken) {
+			// now we know that object isn't nil, we are safe to make
+			// further assertions without causing any errors
+			assert.Equal(t,ErrorMalformedToken.Error(), errToken.Error())
+		  }
+	}
+}
 
+func TestVerifyTokenErrorOther(t *testing.T) {
+	var err error
+	td := &model.TokenDetails{}
+	td.AtExpires = time.Now().Add( 1 * time.Second).Unix()
+	atClaims := jwt.MapClaims{}
+	atClaims["exp"] = td.AtExpires
+	at := jwt.NewWithClaims(jwt.SigningMethodHS512, atClaims)
+	td.AccessToken, err = at.SignedString(Access_secret)
+	errorTokenFormat := td.AccessToken +"123"
+	
+	if err == nil {
+		_, errToken := VerifyToken(Access_secret,errorTokenFormat)
+		  // assert for not nil (good when you expect something)
+		  
+		  if assert.NotNil(t,errToken) {
+			// now we know that object isn't nil, we are safe to make
+			// further assertions without causing any errors
+			assert.Equal(t,ErrorOtherToken.Error(), errToken.Error())
+		  }
+	}
 }

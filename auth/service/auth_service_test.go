@@ -68,10 +68,10 @@ func TestVerifyTokenErrorExpired(t *testing.T) {
 			// further assertions without causing any errors
 			assert.Equal(t, errToken.Error(), ErrExpiredToken.Error())
 		  }else{
-			  t.Errorf("errToken is nil"))
+			  t.Errorf("errToken is nil")
 		  }
 	}else{
-		t.Errorf("AccessToken can not create correctly"))
+		t.Errorf("AccessToken can not create correctly")
 	}
 }
 
@@ -94,10 +94,10 @@ func TestVerifyTokenErrorMalfFormat(t *testing.T) {
 			// further assertions without causing any errors
 			assert.Equal(t,ErrorMalformedToken.Error(), errToken.Error())
 		  }else{
-			  t.Errorf("errToken is nil"))
+			  t.Errorf("errToken is nil")
 		  }
 	}else{
-		t.Errorf("AccessToken can not create correctly"))
+		t.Errorf("AccessToken can not create correctly")
 	}
 }
 
@@ -120,9 +120,9 @@ func TestVerifyTokenErrorOther(t *testing.T) {
 			// further assertions without causing any errors
 			assert.Equal(t,ErrorOtherToken.Error(), errToken.Error())
 		  }else{
-			  t.Errorf("errToken is nil"))
+			  t.Errorf("errToken is nil")
 		  }
 	}else{
-		t.Errorf("AccessToken can not create correctly"))
+		t.Errorf("AccessToken can not create correctly")
 	}
 }

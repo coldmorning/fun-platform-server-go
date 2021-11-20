@@ -2,7 +2,7 @@
 ## Description: 
 Make the world more interesting
 ## Feature: 
-auth
+auth \
 board
 ## Framewrok: 
 gin 1.7

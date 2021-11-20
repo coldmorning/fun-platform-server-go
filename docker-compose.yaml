@@ -142,40 +142,6 @@ services:
     networks:
       - elastic_net
 
-  drone-server:
-    image: drone/drone:2.3.1
-    ports:
-      - 9000:443
-      - 8000:80
-    volumes:
-      - C:\Users\yulia\Desktop\docker\drone:/data:rw
-      - ./ssl:/etc/certs
-    restart: always
-    environment:
-      - DRONE_SERVER_HOST=${DRONE_SERVER_HOST:-https://drone.yeasy.com}
-      - DRONE_SERVER_PROTO=${DRONE_SERVER_PROTO:-https}
-      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET:-secret}
-      
-      #Github Config
-      - DRONE_GITHUB_SERVER=https://github.com
-      - DRONE_GITHUB_CLIENT_ID=${DRONE_GITHUB_CLIENT_ID}
-      - DRONE_GITHUB_CLIENT_SECRET=${DRONE_GITHUB_CLIENT_SECRET}
-    networks:
-      - drone_net
-  drone-agent:
-    image: drone/drone-runner-docker:1
-    restart: always
-    networks:
-      - drone_net
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:rw
-    environment:
-      - DRONE_RPC_PROTO=http
-      - DRONE_RPC_HOST=drone-server
-      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET:-secret}
-      - DRONE_RUNNER_NAME=${HOSTNAME:-demo}
-      - DRONE_RUNNER_CAPACITY=2
-
 volumes:
   data01:
     driver: local

@@ -1,13 +1,20 @@
-﻿# FunPlatform
+# FunPlatform
 ## Description: 
 Make the world more interesting
+## Feature: 
+auth
+board
 ## Framewrok: 
 gin 1.7
 ## DataBase: 
-PostgreSql 
+PostgreSql, Redis
 ## golang Version: 
 16
 ## Connect DataBase: 
 gorm 
-## build Tool: 
+## Build Tool: 
 Docker-compose , MakeFile
+## CI/CD:
+circleci
+## Doc:
+swagger (openapi 3.0)

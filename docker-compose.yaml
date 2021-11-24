@@ -1,5 +1,18 @@
 version: '3.8'
 services:
+  fun-platform-server:
+    image: 'fun-platform-server'
+    container_name: 'fun-platform-server'
+    build: ./
+    restart: always
+    ports:
+      - 8085:8083
+    networks:
+      - postgres_net
+      - redis_net
+      - rabbitmq_net
+      - elastic_net
+      
   swagger-editor:
     container_name: swagger-editor
     image: swaggerapi/swagger-editor
@@ -13,7 +26,7 @@ services:
     command: redis-server --requirepass password123 --appendonly yes
     restart: unless-stopped
     networks:
-      - redis
+      - redis_net
   redis-gui:
     container_name: redis-gui
     hostname: redis-gui
@@ -24,7 +37,7 @@ services:
     ports:
       - 8091:8081
     networks:
-      - redis
+      - redis_net
   postgresql:
     container_name: postgres13
     image: postgres:13.4-alpine
@@ -37,7 +50,7 @@ services:
     ports:
       - 5432:5432
     networks:
-      - postgres
+      - postgres_net
     restart: unless-stopped 
   
   postgresql_gui:
@@ -52,7 +65,7 @@ services:
     ports:
       - 5050:80
     networks:
-      - postgres
+      - postgres_net
     restart: unless-stopped
     
   rabbitmq:
@@ -149,16 +162,13 @@ volumes:
     driver: local
   data03:
     driver: local
-
-        
+   
 networks:
-  postgres:
+  postgres_net:
     driver: bridge
-  redis:
+  redis_net:
     driver: bridge
   rabbitmq_net:
     driver: bridge
   elastic_net:
-    driver: bridge
-  drone_net:
     driver: bridge

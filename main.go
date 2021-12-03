@@ -1,4 +1,5 @@
 package main
+
 import (
 	"log"
 	"os"
@@ -11,8 +12,10 @@ import (
 	"github.com/go-redis/redis/v7"
 )
 
-var client *redis.Client
-var router = gin.Default()
+var (
+	client *redis.Client
+	router = gin.Default()
+)
 
 func init() {
 	config, err := config.GetConfig()
@@ -48,7 +51,7 @@ func main() {
 		v1_router.POST("logout", middleware.Log, authttp.Logout)
 		v1_router.POST("refresh", middleware.Log, authttp.Refresh)
 		v1_router.GET("test", middleware.Log, authttp.Test)
-		
+
 		boardRouter := v1_router.Group("board")
 		boardRouter.Use(middleware.Auth)
 		{

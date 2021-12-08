@@ -6,13 +6,13 @@ metadata:
     kompose.version: 1.24.0 (7c629530)
   creationTimestamp: null
   labels:
-    io.kompose.service: redis-gui
-  name: redis-gui
+    io.kompose.service: fun-platform-server
+  name: fun-platform-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: redis-gui
+      io.kompose.service: fun-platform-server
   strategy: {}
   template:
     metadata:
@@ -21,18 +21,17 @@ spec:
         kompose.version: 1.24.0 (7c629530)
       creationTimestamp: null
       labels:
+        io.kompose.network/elastic_net: "true"
+        io.kompose.network/postgres_net: "true"
+        io.kompose.network/rabbitmq_net: "true"
         io.kompose.network/redis_net: "true"
-        io.kompose.service: redis-gui
+        io.kompose.service: fun-platform-server
     spec:
       containers:
-        - env:
-            - name: REDIS_HOSTS
-              value: label:fun-platform-redis-node1:6379:0:password123
-          image: rediscommander/redis-commander:latest
-          name: redis-gui
+        - image: fun-platform-server
+          name: fun-platform-server
           ports:
-            - containerPort: 8081
+            - containerPort: 8083
           resources: {}
-      hostname: redis-gui
       restartPolicy: Always
 status: {}

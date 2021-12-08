@@ -6,13 +6,13 @@ metadata:
     kompose.version: 1.24.0 (7c629530)
   creationTimestamp: null
   labels:
-    io.kompose.service: redis-gui
-  name: redis-gui
+    io.kompose.service: kib01
+  name: kib01
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: redis-gui
+      io.kompose.service: kib01
   strategy: {}
   template:
     metadata:
@@ -21,18 +21,19 @@ spec:
         kompose.version: 1.24.0 (7c629530)
       creationTimestamp: null
       labels:
-        io.kompose.network/redis_net: "true"
-        io.kompose.service: redis-gui
+        io.kompose.network/elastic_net: "true"
+        io.kompose.service: kib01
     spec:
       containers:
         - env:
-            - name: REDIS_HOSTS
-              value: label:fun-platform-redis-node1:6379:0:password123
-          image: rediscommander/redis-commander:latest
-          name: redis-gui
+            - name: ELASTICSEARCH_HOSTS
+              value: '["http://es01:9200","http://es02:9200","http://es03:9200"]'
+            - name: ELASTICSEARCH_URL
+              value: http://es01:9200
+          image: docker.elastic.co/kibana/kibana:7.15.2
+          name: kib01
           ports:
-            - containerPort: 8081
+            - containerPort: 5601
           resources: {}
-      hostname: redis-gui
       restartPolicy: Always
 status: {}

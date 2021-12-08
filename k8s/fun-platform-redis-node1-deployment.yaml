@@ -21,7 +21,7 @@ spec:
         kompose.version: 1.24.0 (7c629530)
       creationTimestamp: null
       labels:
-        io.kompose.network/redis: "true"
+        io.kompose.network/redis_net: "true"
         io.kompose.service: fun-platform-redis-node1
     spec:
       containers:
